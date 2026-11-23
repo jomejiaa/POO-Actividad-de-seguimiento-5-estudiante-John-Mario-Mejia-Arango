@@ -1,0 +1,935 @@
+//Ejerciciopag517.java
+
+package com.mycompany.ejerciciopag517;
+
+public class Ejerciciopag517 {
+
+    public static void main(String[] args) {
+
+        java.awt.EventQueue.invokeLater(() -> {
+
+            VentanaPrincipal ventana = new VentanaPrincipal();
+
+            ventana.setVisible(true);
+        });
+    }
+}
+
+//Empleado.java
+
+package com.mycompany.ejerciciopag517;
+
+public class Empleado {
+
+    private String nombre;
+    private String apellidos;
+    private TipoCargo cargo;
+    private TipoGenero genero;
+    private double salarioDia;
+    private int diasTrabajados;
+    private double otrosIngresos;
+    private double pagosSalud;
+    private double aportePensiones;
+
+    public Empleado(String nombre, String apellidos,
+                    TipoCargo cargo, TipoGenero genero,
+                    double salarioDia, int diasTrabajados,
+                    double otrosIngresos, double pagosSalud,
+                    double aportePensiones) {
+
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.cargo = cargo;
+        this.genero = genero;
+        this.salarioDia = salarioDia;
+        this.diasTrabajados = diasTrabajados;
+        this.otrosIngresos = otrosIngresos;
+        this.pagosSalud = pagosSalud;
+        this.aportePensiones = aportePensiones;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public TipoCargo getCargo() {
+        return cargo;
+    }
+
+    public TipoGenero getGenero() {
+        return genero;
+    }
+
+    public double getSalarioDia() {
+        return salarioDia;
+    }
+
+    public int getDiasTrabajados() {
+        return diasTrabajados;
+    }
+
+    public double getOtrosIngresos() {
+        return otrosIngresos;
+    }
+
+    public double getPagosSalud() {
+        return pagosSalud;
+    }
+
+    public double getAportePensiones() {
+        return aportePensiones;
+    }
+
+    public double calcularNomina() {
+
+        return (salarioDia * diasTrabajados)
+                + otrosIngresos
+                - pagosSalud
+                - aportePensiones;
+    }
+}
+
+//ListaEmpleados.java
+
+package com.mycompany.ejerciciopag517;
+
+import java.util.ArrayList;
+
+public class ListaEmpleados {
+
+    private ArrayList<Empleado> lista;
+
+    public ListaEmpleados() {
+        lista = new ArrayList<>();
+    }
+
+    public void agregarEmpleado(Empleado empleado) {
+        lista.add(empleado);
+    }
+
+    public double calcularTotalNomina() {
+
+        double totalNomina = 0;
+
+        for (Empleado empleado : lista) {
+            totalNomina += empleado.calcularNomina();
+        }
+
+        return totalNomina;
+    }
+
+    public String[][] obtenerMatriz() {
+
+        String[][] datos = new String[lista.size()][3];
+
+        for (int i = 0; i < lista.size(); i++) {
+
+            Empleado empleado = lista.get(i);
+
+            datos[i][0] = empleado.getNombre();
+            datos[i][1] = empleado.getApellidos();
+            datos[i][2] = String.format(
+                    "%.2f", empleado.calcularNomina());
+        }
+
+        return datos;
+    }
+
+public String convertirTexto() {
+
+    StringBuilder texto = new StringBuilder();
+
+    String salto = "\r\n";
+
+    for (Empleado empleado : lista) {
+
+        texto.append("Nombre = ")
+                .append(empleado.getNombre()).append(salto);
+
+        texto.append("Apellidos = ")
+                .append(empleado.getApellidos()).append(salto);
+
+        texto.append("Cargo = ")
+                .append(empleado.getCargo()).append(salto);
+
+        texto.append("Género = ")
+                .append(empleado.getGenero()).append(salto);
+
+        texto.append("Salario por día = $")
+                .append(String.format("%.2f",
+                        empleado.getSalarioDia()))
+                .append(salto);
+
+        texto.append("Días trabajados = ")
+                .append(empleado.getDiasTrabajados())
+                .append(salto);
+
+        texto.append("Otros ingresos = $")
+                .append(String.format("%.2f",
+                        empleado.getOtrosIngresos()))
+                .append(salto);
+
+        texto.append("Pagos por salud = $")
+                .append(String.format("%.2f",
+                        empleado.getPagosSalud()))
+                .append(salto);
+
+        texto.append("Aportes pensiones = $")
+                .append(String.format("%.2f",
+                        empleado.getAportePensiones()))
+                .append(salto);
+
+        texto.append("Salario mensual = $")
+                .append(String.format("%.2f",
+                        empleado.calcularNomina()))
+                .append(salto);
+
+        texto.append("----------------------------")
+                .append(salto);
+    }
+
+    texto.append("Total nómina = $")
+            .append(String.format("%.2f",
+                    calcularTotalNomina()))
+            .append(salto);
+
+    return texto.toString();
+} 
+}
+
+//TipoCargo.java
+
+package com.mycompany.ejerciciopag517;
+
+public enum TipoCargo {
+    DIRECTIVO,
+    ESTRATEGICO,
+    OPERATIVO
+}
+
+//TipoGenero
+
+package com.mycompany.ejerciciopag517;
+
+public enum TipoGenero {
+    MASCULINO,
+    FEMENINO
+}
+
+//VentanaAgregarEmpleado.java
+
+package com.mycompany.ejerciciopag517;
+
+
+public class VentanaAgregarEmpleado extends javax.swing.JDialog {
+    
+    private ListaEmpleados lista;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaAgregarEmpleado.class.getName());
+
+    public VentanaAgregarEmpleado(java.awt.Frame parent, boolean modal, ListaEmpleados lista) {
+        super(parent, modal);
+        initComponents();
+
+        this.lista = lista;
+
+        setLocationRelativeTo(parent);
+    }
+
+    private void limpiarCampos() {
+
+        txtNombre.setText("");
+        txtApellidos.setText("");
+        txtSalarioDia.setText("");
+        txtOtrosIngresos.setText("");
+        txtPagosSalud.setText("");
+        txtAportePensiones.setText("");
+
+        cmbCargo.setSelectedIndex(0);
+
+        rbtnMasculino.setSelected(true);
+
+        spnDiasTrabajados.setValue(30);
+
+        txtNombre.requestFocusInWindow();
+    }
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        grupoGenero = new javax.swing.ButtonGroup();
+        lblNombre = new javax.swing.JLabel();
+        lblApellidos = new javax.swing.JLabel();
+        lblCargo = new javax.swing.JLabel();
+        lblGenero = new javax.swing.JLabel();
+        lblSalarioDia = new javax.swing.JLabel();
+        lblDiasTrabajados = new javax.swing.JLabel();
+        lblOtrosIngresos = new javax.swing.JLabel();
+        lblPagosSalud = new javax.swing.JLabel();
+        lblAportePensiones = new javax.swing.JLabel();
+        txtNombre = new javax.swing.JTextField();
+        txtApellidos = new javax.swing.JTextField();
+        txtSalarioDia = new javax.swing.JTextField();
+        txtOtrosIngresos = new javax.swing.JTextField();
+        txtPagosSalud = new javax.swing.JTextField();
+        txtAportePensiones = new javax.swing.JTextField();
+        cmbCargo = new javax.swing.JComboBox<>();
+        rbtnMasculino = new javax.swing.JRadioButton();
+        rbtnFemenino = new javax.swing.JRadioButton();
+        spnDiasTrabajados = new javax.swing.JSpinner();
+        btnAgregar = new javax.swing.JButton();
+        btnBorrar = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Ejercicio 8.4 Agregar Empleado");
+        setResizable(false);
+
+        lblNombre.setText("Nombre:");
+
+        lblApellidos.setText("Apellidos:");
+
+        lblCargo.setText("Cargo:");
+
+        lblGenero.setText("Género:");
+
+        lblSalarioDia.setText("Salario por día:");
+
+        lblDiasTrabajados.setText("Días trabajados al mes:");
+
+        lblOtrosIngresos.setText("Otros ingresos:");
+
+        lblPagosSalud.setText("Pagos por salud:");
+
+        lblAportePensiones.setText("Aporte pensiones:");
+
+        cmbCargo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Directivo", "Estratégico", "Operativo" }));
+
+        grupoGenero.add(rbtnMasculino);
+        rbtnMasculino.setSelected(true);
+        rbtnMasculino.setText("Masculino");
+        rbtnMasculino.addActionListener(this::rbtnMasculinoActionPerformed);
+
+        grupoGenero.add(rbtnFemenino);
+        rbtnFemenino.setText("Femenino");
+
+        spnDiasTrabajados.setModel(new javax.swing.SpinnerNumberModel(30, 1, 31, 1));
+
+        btnAgregar.setText("Agregar");
+        btnAgregar.addActionListener(this::btnAgregarActionPerformed);
+
+        btnBorrar.setText("Borrar");
+        btnBorrar.addActionListener(this::btnBorrarActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(40, 40, 40)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblApellidos)
+                                    .addComponent(lblNombre))
+                                .addGap(126, 126, 126))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblCargo)
+                                    .addComponent(lblGenero)
+                                    .addComponent(lblSalarioDia)
+                                    .addComponent(lblDiasTrabajados)
+                                    .addComponent(lblOtrosIngresos)
+                                    .addComponent(lblPagosSalud)
+                                    .addComponent(lblAportePensiones))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(rbtnFemenino)
+                            .addComponent(cmbCargo, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(txtApellidos, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(txtNombre, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(rbtnMasculino)
+                            .addComponent(txtSalarioDia)
+                            .addComponent(spnDiasTrabajados)
+                            .addComponent(txtOtrosIngresos)
+                            .addComponent(txtAportePensiones)
+                            .addComponent(txtPagosSalud)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(100, 100, 100)
+                        .addComponent(btnAgregar)
+                        .addGap(44, 44, 44)
+                        .addComponent(btnBorrar)))
+                .addContainerGap(90, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNombre)
+                    .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(cmbCargo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(13, 13, 13)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblGenero)
+                            .addComponent(rbtnMasculino))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(rbtnFemenino)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtSalarioDia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(lblSalarioDia)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblApellidos)
+                        .addGap(18, 18, 18)
+                        .addComponent(lblCargo)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(spnDiasTrabajados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDiasTrabajados))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblOtrosIngresos)
+                    .addComponent(txtOtrosIngresos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblPagosSalud)
+                    .addComponent(txtAportePensiones, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblAportePensiones)
+                    .addComponent(txtPagosSalud, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBorrar)
+                    .addComponent(btnAgregar))
+                .addGap(16, 16, 16))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {                                           
+
+    try {
+
+        String nombre = txtNombre.getText().trim();
+        String apellidos = txtApellidos.getText().trim();
+
+        if (nombre.isEmpty() || apellidos.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Debe ingresar el nombre y los apellidos.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        TipoCargo cargo;
+
+        switch (cmbCargo.getSelectedIndex()) {
+            case 0:
+                cargo = TipoCargo.DIRECTIVO;
+                break;
+            case 1:
+                cargo = TipoCargo.ESTRATEGICO;
+                break;
+            default:
+                cargo = TipoCargo.OPERATIVO;
+                break;
+        }
+
+        TipoGenero genero;
+
+        if (rbtnMasculino.isSelected()) {
+            genero = TipoGenero.MASCULINO;
+        } else {
+            genero = TipoGenero.FEMENINO;
+        }
+
+        double salarioDia = Double.parseDouble(
+                txtSalarioDia.getText().trim());
+
+        int diasTrabajados =
+                (Integer) spnDiasTrabajados.getValue();
+
+        double otrosIngresos = Double.parseDouble(
+                txtOtrosIngresos.getText().trim());
+
+        double pagosSalud = Double.parseDouble(
+                txtPagosSalud.getText().trim());
+
+        double aportePensiones = Double.parseDouble(
+                txtAportePensiones.getText().trim());
+
+        if (salarioDia < 0 || otrosIngresos < 0
+                || pagosSalud < 0 || aportePensiones < 0
+                || !Double.isFinite(salarioDia)
+                || !Double.isFinite(otrosIngresos)
+                || !Double.isFinite(pagosSalud)
+                || !Double.isFinite(aportePensiones)) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Los valores monetarios deben ser números válidos "
+                    + "y no negativos.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        Empleado empleado = new Empleado(
+                nombre,
+                apellidos,
+                cargo,
+                genero,
+                salarioDia,
+                diasTrabajados,
+                otrosIngresos,
+                pagosSalud,
+                aportePensiones);
+
+        lista.agregarEmpleado(empleado);
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "El empleado ha sido agregado correctamente.",
+                "Mensaje",
+                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+    } catch (NumberFormatException e) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Verifique los campos numéricos. "
+                + "No deben estar vacíos ni contener letras.",
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+
+    }                                          
+
+    private void btnBorrarActionPerformed(java.awt.event.ActionEvent evt) {                                          
+        limpiarCampos();
+    }                                         
+
+    private void rbtnMasculinoActionPerformed(java.awt.event.ActionEvent evt) {                                              
+
+    }                                             
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                VentanaAgregarEmpleado dialog = new VentanaAgregarEmpleado(new javax.swing.JFrame(), true, new ListaEmpleados());
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnAgregar;
+    private javax.swing.JButton btnBorrar;
+    private javax.swing.JComboBox<String> cmbCargo;
+    private javax.swing.ButtonGroup grupoGenero;
+    private javax.swing.JLabel lblApellidos;
+    private javax.swing.JLabel lblAportePensiones;
+    private javax.swing.JLabel lblCargo;
+    private javax.swing.JLabel lblDiasTrabajados;
+    private javax.swing.JLabel lblGenero;
+    private javax.swing.JLabel lblNombre;
+    private javax.swing.JLabel lblOtrosIngresos;
+    private javax.swing.JLabel lblPagosSalud;
+    private javax.swing.JLabel lblSalarioDia;
+    private javax.swing.JRadioButton rbtnFemenino;
+    private javax.swing.JRadioButton rbtnMasculino;
+    private javax.swing.JSpinner spnDiasTrabajados;
+    private javax.swing.JTextField txtApellidos;
+    private javax.swing.JTextField txtAportePensiones;
+    private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtOtrosIngresos;
+    private javax.swing.JTextField txtPagosSalud;
+    private javax.swing.JTextField txtSalarioDia;
+    // End of variables declaration                   
+}
+
+//VentanaNomina.java
+
+package com.mycompany.ejerciciopag517;
+
+
+public class VentanaNomina extends javax.swing.JDialog {
+    
+    
+    private ListaEmpleados lista;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaNomina.class.getName());
+
+        public VentanaNomina(java.awt.Frame parent,
+                            boolean modal,
+                            ListaEmpleados lista) {
+            super(parent, modal);
+            initComponents();
+
+            this.lista = lista;
+
+            setLocationRelativeTo(parent); 
+            mostrarNomina();
+        }
+
+private void mostrarNomina() {
+
+    String[][] datos = lista.obtenerMatriz();
+
+    String[] columnas = {
+        "NOMBRE",
+        "APELLIDOS",
+        "SUELDO"
+    };
+
+    javax.swing.table.DefaultTableModel modelo =
+            new javax.swing.table.DefaultTableModel(
+                    datos, columnas) {
+
+        @Override
+        public boolean isCellEditable(int fila, int columna) {
+            return false;
+        }
+    };
+
+    tblEmpleados.setModel(modelo);
+
+    double total = lista.calcularTotalNomina();
+
+    lblTotalNomina.setText(
+            "Total nómina mensual: $"
+            + String.format("%.2f", total)
+    );
+}
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        lblListaEmpleados = new javax.swing.JLabel();
+        lblTotalNomina = new javax.swing.JLabel();
+        scrollEmpleados = new javax.swing.JScrollPane();
+        tblEmpleados = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Ejercicio 8.4 Nómina de Empleados");
+        setModal(true);
+        setPreferredSize(new java.awt.Dimension(450, 350));
+        setResizable(false);
+
+        lblListaEmpleados.setText("Lista de empleados");
+
+        lblTotalNomina.setText("Total nómina mensual: $0.00");
+
+        tblEmpleados.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "NOMBRE", "APELLIDOS", "SUELDO"
+            }
+        ));
+        scrollEmpleados.setViewportView(tblEmpleados);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblListaEmpleados)
+                .addGap(280, 280, 280))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollEmpleados, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTotalNomina, javax.swing.GroupLayout.PREFERRED_SIZE, 348, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblListaEmpleados)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scrollEmpleados, javax.swing.GroupLayout.PREFERRED_SIZE, 241, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addComponent(lblTotalNomina)
+                .addGap(26, 26, 26))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                
+                VentanaNomina dialog = new VentanaNomina(new javax.swing.JFrame(),true, new ListaEmpleados());
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+            }
+        });
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JLabel lblListaEmpleados;
+    private javax.swing.JLabel lblTotalNomina;
+    private javax.swing.JScrollPane scrollEmpleados;
+    private javax.swing.JTable tblEmpleados;
+    // End of variables declaration                   
+}
+
+//VentanaPrincipal.java
+
+package com.mycompany.ejerciciopag517;
+
+public class VentanaPrincipal extends javax.swing.JFrame {
+    
+    private ListaEmpleados empleados;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName());
+
+    public VentanaPrincipal() {
+        initComponents();
+
+        empleados = new ListaEmpleados();
+
+        setLocationRelativeTo(null);
+    }
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        barraMenu = new javax.swing.JMenuBar();
+        menuOpciones = new javax.swing.JMenu();
+        itemAgregarEmpleado = new javax.swing.JMenuItem();
+        itemCalcularNomina = new javax.swing.JMenuItem();
+        separadorMenu = new javax.swing.JPopupMenu.Separator();
+        itemGuardarArchivo = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Ejercicio 8.4 Nómina");
+        setResizable(false);
+
+        menuOpciones.setText("Menú");
+
+        itemAgregarEmpleado.setText("Agregar empleado");
+        itemAgregarEmpleado.addActionListener(this::itemAgregarEmpleadoActionPerformed);
+        menuOpciones.add(itemAgregarEmpleado);
+
+        itemCalcularNomina.setText("Calcular nómina");
+        itemCalcularNomina.addActionListener(this::itemCalcularNominaActionPerformed);
+        menuOpciones.add(itemCalcularNomina);
+        menuOpciones.add(separadorMenu);
+
+        itemGuardarArchivo.setText("Guardar archivo");
+        itemGuardarArchivo.addActionListener(this::itemGuardarArchivoActionPerformed);
+        menuOpciones.add(itemGuardarArchivo);
+
+        barraMenu.add(menuOpciones);
+
+        setJMenuBar(barraMenu);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 335, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 209, Short.MAX_VALUE)
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void itemAgregarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+
+    VentanaAgregarEmpleado ventana =
+            new VentanaAgregarEmpleado(this, true, empleados);
+
+    ventana.setVisible(true);
+
+    }                                                   
+
+    private void itemCalcularNominaActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+          VentanaNomina ventana = new VentanaNomina(this, true, empleados);
+        ventana.setVisible(true);
+    }                                                  
+
+    private void itemGuardarArchivoActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+    javax.swing.JFileChooser selector =
+            new javax.swing.JFileChooser();
+
+    selector.setFileSelectionMode(
+            javax.swing.JFileChooser.DIRECTORIES_ONLY);
+
+    selector.setDialogTitle(
+            "Seleccione la carpeta para guardar la nómina");
+
+    int respuesta = selector.showOpenDialog(this);
+
+    if (respuesta == javax.swing.JFileChooser.APPROVE_OPTION) {
+
+        java.io.File carpeta = selector.getSelectedFile();
+
+        java.io.File archivo =
+                new java.io.File(carpeta, "Nómina.txt");
+
+        try {
+
+            String contenido = empleados.convertirTexto();
+
+            try (java.io.BufferedWriter escritor =
+                    java.nio.file.Files.newBufferedWriter(
+                            archivo.toPath(),
+                            java.nio.charset.StandardCharsets.UTF_8)) {
+
+                escritor.write(contenido);
+            }
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "El archivo Nómina.txt se ha guardado correctamente en:\n"
+                    + archivo.getAbsolutePath(),
+                    "Archivo guardado",
+                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (java.io.IOException e) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "No fue posible guardar el archivo.\n"
+                    + e.getMessage(),
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    }                                                  
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new VentanaPrincipal().setVisible(true));
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JMenuBar barraMenu;
+    private javax.swing.JMenuItem itemAgregarEmpleado;
+    private javax.swing.JMenuItem itemCalcularNomina;
+    private javax.swing.JMenuItem itemGuardarArchivo;
+    private javax.swing.JMenu menuOpciones;
+    private javax.swing.JPopupMenu.Separator separadorMenu;
+    // End of variables declaration                   
+}
