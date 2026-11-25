@@ -1,0 +1,23 @@
+Nombre = Pepito
+Apellidos = Perez
+Cargo = DIRECTIVO
+Género = MASCULINO
+Salario por día = $100000,00
+Días trabajados = 30
+Otros ingresos = $800000,00
+Pagos por salud = $300000,00
+Aportes pensiones = $600000,00
+Salario mensual = $2900000,00
+----------------------------
+Nombre = María
+Apellidos = Gomez
+Cargo = ESTRATEGICO
+Género = MASCULINO
+Salario por día = $120000,00
+Días trabajados = 25
+Otros ingresos = $500000,00
+Pagos por salud = $150000,00
+Aportes pensiones = $200000,00
+Salario mensual = $3150000,00
+----------------------------
+Total nómina = $6050000,00
