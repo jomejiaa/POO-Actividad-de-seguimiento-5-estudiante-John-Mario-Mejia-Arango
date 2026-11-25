@@ -1,0 +1,1613 @@
+//Ejerciciopag546.java
+
+package com.mycompany.ejerciciopag546;
+
+public class Ejerciciopag546 {
+
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+    }
+}
+
+//Habitacion.java
+
+package com.mycompany.ejerciciopag546;
+
+public class Habitacion {
+
+    private int numeroHabitacion;
+    private boolean disponible;
+    private double precioDia;
+    private Huesped huesped;
+
+    public Habitacion(int numeroHabitacion, boolean disponible,
+                     double precioDia) {
+        this.numeroHabitacion = numeroHabitacion;
+        this.disponible = disponible;
+        this.precioDia = precioDia;
+        this.huesped = null;
+    }
+
+    public int getNumeroHabitacion() {
+        return numeroHabitacion;
+    }
+
+    public boolean getDisponible() {
+        return disponible;
+    }
+
+    public double getPrecioDia() {
+        return precioDia;
+    }
+
+    public Huesped getHuesped() {
+        return huesped;
+    }
+
+    public void setHuesped(Huesped huesped) {
+        this.huesped = huesped;
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
+}
+
+//Hotel.java
+
+package com.mycompany.ejerciciopag546;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Vector;
+
+public class Hotel {
+
+    private final Vector<Habitacion> listaHabitaciones;
+
+    public Hotel() {
+
+        listaHabitaciones = new Vector<>();
+
+        for (int i = 1; i <= 10; i++) {
+
+            double precioDia;
+
+            if (i <= 5) {
+                precioDia = 120000;
+            } else {
+                precioDia = 160000;
+            }
+
+            Habitacion habitacion =
+                    new Habitacion(i, true, precioDia);
+
+            listaHabitaciones.add(habitacion);
+        }
+    }
+
+    public Vector<Habitacion> getListaHabitaciones() {
+        return listaHabitaciones;
+    }
+
+    public Habitacion buscarHabitacion(int numero) {
+
+        for (Habitacion habitacion : listaHabitaciones) {
+
+            if (habitacion.getNumeroHabitacion() == numero) {
+                return habitacion;
+            }
+        }
+
+        return null;
+    }
+
+    public boolean buscarHabitacionOcupada(int numero) {
+
+        Habitacion habitacion = buscarHabitacion(numero);
+
+        if (habitacion != null) {
+            return !habitacion.getDisponible();
+        }
+
+        return false;
+    }
+
+    public String buscarFechaIngresoHabitacion(int numero) {
+
+        Habitacion habitacion = buscarHabitacion(numero);
+
+        if (habitacion != null
+                && habitacion.getHuesped() != null) {
+
+            Date fecha =
+                    habitacion.getHuesped().getFechaIngreso();
+
+            if (fecha != null) {
+
+                SimpleDateFormat formatoFecha =
+                        new SimpleDateFormat("yyyy-MM-dd");
+
+                return formatoFecha.format(fecha);
+            }
+        }
+
+        return "";
+    }
+}
+
+//Huesped.java
+
+package com.mycompany.ejerciciopag546;
+
+import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+
+public class Huesped {
+
+    private String nombres;
+    private String apellidos;
+    private int documentoIdentidad;
+    private Date fechaIngreso;
+    private Date fechaSalida;
+
+    public Huesped(String nombres, String apellidos,
+                   int documentoIdentidad) {
+        this.nombres = nombres;
+        this.apellidos = apellidos;
+        this.documentoIdentidad = documentoIdentidad;
+    }
+
+    public void setFechaIngreso(Date fecha) {
+        this.fechaIngreso = fecha;
+    }
+
+    public void setFechaSalida(Date fecha) {
+        this.fechaSalida = fecha;
+    }
+
+    public Date getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public Date getFechaSalida() {
+        return fechaSalida;
+    }
+
+    public String getNombres() {
+        return nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public int getDocumentoIdentidad() {
+        return documentoIdentidad;
+    }
+
+    public int obtenerDiasAlojamiento() {
+
+        LocalDate ingreso = fechaIngreso.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDate salida = fechaSalida.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        return (int) ChronoUnit.DAYS.between(ingreso, salida);
+    }
+}
+
+//Principal.java
+
+package com.mycompany.ejerciciopag546;
+
+import javax.swing.SwingUtilities;
+
+public class Principal {
+
+    public static void main(String[] args) {
+
+        SwingUtilities.invokeLater(() -> {
+
+            Hotel hotel = new Hotel();
+
+            VentanaPrincipal ventanaPrincipal =
+                    new VentanaPrincipal(hotel);
+
+            ventanaPrincipal.setLocationRelativeTo(null);
+
+            ventanaPrincipal.setVisible(true);
+
+        });
+    }
+}
+
+//VentanaHabitaciones.java
+
+package com.mycompany.ejerciciopag546;
+
+public class VentanaHabitaciones extends javax.swing.JFrame {
+
+    private Hotel hotel;
+
+    private static final java.util.logging.Logger logger =
+            java.util.logging.Logger.getLogger(
+                    VentanaHabitaciones.class.getName());
+
+    public VentanaHabitaciones(Hotel hotel) {
+        initComponents();
+        this.hotel = hotel;
+        setLocationRelativeTo(null);
+        actualizarDisponibilidad();
+    }
+    
+private void actualizarDisponibilidad() {
+
+    javax.swing.JLabel[] etiquetasEstado = {
+        lblEstado1, lblEstado2, lblEstado3,
+        lblEstado4, lblEstado5, lblEstado6,
+        lblEstado7, lblEstado8, lblEstado9,
+        lblEstado10
+    };
+
+    for (int i = 0; i < 10; i++) {
+
+        Habitacion habitacion =
+                hotel.buscarHabitacion(i + 1);
+
+        if (habitacion != null) {
+
+            if (habitacion.getDisponible()) {
+
+                etiquetasEstado[i].setText("Disponible");
+
+                etiquetasEstado[i].setForeground(
+                        new java.awt.Color(0, 128, 0));
+
+            } else {
+
+                etiquetasEstado[i].setText("No disponible");
+
+                etiquetasEstado[i].setForeground(
+                        java.awt.Color.RED);
+            }
+        }
+    }
+}
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        lblHabitacion1 = new javax.swing.JLabel();
+        lblEstado1 = new javax.swing.JLabel();
+        lblHabitacion2 = new javax.swing.JLabel();
+        lblEstado2 = new javax.swing.JLabel();
+        lblHabitacion3 = new javax.swing.JLabel();
+        lblEstado3 = new javax.swing.JLabel();
+        lblHabitacion4 = new javax.swing.JLabel();
+        lblEstado4 = new javax.swing.JLabel();
+        lblHabitacion5 = new javax.swing.JLabel();
+        lblEstado5 = new javax.swing.JLabel();
+        lblHabitacion6 = new javax.swing.JLabel();
+        lblEstado6 = new javax.swing.JLabel();
+        lblHabitacion7 = new javax.swing.JLabel();
+        lblEstado7 = new javax.swing.JLabel();
+        lblHabitacion8 = new javax.swing.JLabel();
+        lblEstado8 = new javax.swing.JLabel();
+        lblHabitacion9 = new javax.swing.JLabel();
+        lblEstado9 = new javax.swing.JLabel();
+        lblHabitacion10 = new javax.swing.JLabel();
+        lblEstado10 = new javax.swing.JLabel();
+        lblPrecio1 = new javax.swing.JLabel();
+        lblPrecio2 = new javax.swing.JLabel();
+        lblPrecio3 = new javax.swing.JLabel();
+        lblPrecio4 = new javax.swing.JLabel();
+        lblPrecio5 = new javax.swing.JLabel();
+        lblPrecio6 = new javax.swing.JLabel();
+        lblPrecio7 = new javax.swing.JLabel();
+        lblPrecio8 = new javax.swing.JLabel();
+        lblPrecio9 = new javax.swing.JLabel();
+        lblPrecio10 = new javax.swing.JLabel();
+        lblHabitacionSeleccionada = new javax.swing.JLabel();
+        spnHabitacion = new javax.swing.JSpinner();
+        btnAceptar = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Ejercicio 8.5 Habitaciones ");
+        setPreferredSize(new java.awt.Dimension(650, 350));
+        setResizable(false);
+
+        lblHabitacion1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion1.setText("Habitación 1");
+
+        lblEstado1.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado1.setText("Disponible");
+
+        lblHabitacion2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion2.setText("Habitación 2");
+
+        lblEstado2.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado2.setText("Disponible");
+
+        lblHabitacion3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion3.setText("Habitación 3");
+
+        lblEstado3.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado3.setText("Disponible");
+
+        lblHabitacion4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion4.setText("Habitación 4");
+
+        lblEstado4.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado4.setText("Disponible");
+
+        lblHabitacion5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion5.setText("Habitación 5");
+
+        lblEstado5.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado5.setText("Disponible");
+
+        lblHabitacion6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion6.setText("Habitación 6");
+
+        lblEstado6.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado6.setText("Disponible");
+
+        lblHabitacion7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion7.setText("Habitación 7");
+
+        lblEstado7.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado7.setText("Disponible");
+
+        lblHabitacion8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion8.setText("Habitación 8");
+
+        lblEstado8.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado8.setText("Disponible");
+
+        lblHabitacion9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion9.setText("Habitación 9");
+
+        lblEstado9.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado9.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado9.setText("Disponible");
+
+        lblHabitacion10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblHabitacion10.setText("Habitación 10");
+
+        lblEstado10.setForeground(new java.awt.Color(0, 102, 0));
+        lblEstado10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblEstado10.setText("Disponible");
+
+        lblPrecio1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio1.setText("$120.000/día");
+
+        lblPrecio2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio2.setText("$120.000/día");
+
+        lblPrecio3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio3.setText("$120.000/día");
+
+        lblPrecio4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio4.setText("$120.000/día");
+
+        lblPrecio5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio5.setText("$120.000/día");
+
+        lblPrecio6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio6.setText("$160.000/día");
+
+        lblPrecio7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio7.setText("$160.000/día");
+
+        lblPrecio8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio8.setText("$160.000/día");
+
+        lblPrecio9.setText("$160.000/día");
+
+        lblPrecio10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPrecio10.setText("$160.000/día");
+
+        lblHabitacionSeleccionada.setText("Habitación a reservar");
+
+        spnHabitacion.setModel(new javax.swing.SpinnerNumberModel(1, 1, 10, 1));
+
+        btnAceptar.setText("Aceptar");
+        btnAceptar.addActionListener(this::btnAceptarActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(26, 26, 26)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblHabitacion1)
+                                    .addComponent(lblPrecio1)
+                                    .addComponent(lblHabitacion6)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblEstado1)
+                                            .addComponent(lblEstado6)))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(lblPrecio6)))
+                        .addGap(36, 36, 36)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblPrecio4)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(lblHabitacion2)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGap(6, 6, 6)
+                                                    .addComponent(lblEstado2)))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lblPrecio2)
+                                                .addGap(5, 5, 5)))
+                                        .addGap(44, 44, 44)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(lblHabitacion3)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGap(6, 6, 6)
+                                                    .addComponent(lblEstado3)))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(lblPrecio3)
+                                                .addGap(5, 5, 5))
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addGroup(layout.createSequentialGroup()
+                                                    .addGap(6, 6, 6)
+                                                    .addComponent(lblEstado8))
+                                                .addComponent(lblHabitacion8))
+                                            .addComponent(lblPrecio8))
+                                        .addGap(44, 44, 44)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblHabitacion4)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addGap(6, 6, 6)
+                                                .addComponent(lblEstado4))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(lblEstado7))
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addComponent(lblPrecio7)
+                                        .addComponent(lblHabitacion7))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(231, 231, 231)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(lblEstado9))
+                                    .addComponent(lblHabitacion9)
+                                    .addComponent(lblPrecio9))))
+                        .addGap(54, 54, 54)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(lblEstado10))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblHabitacion5)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(lblEstado5)
+                                            .addComponent(lblPrecio5))))
+                                .addComponent(lblHabitacion10))
+                            .addComponent(lblPrecio10)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(147, 147, 147)
+                        .addComponent(lblHabitacionSeleccionada)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(spnHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnAceptar)))
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblHabitacion1)
+                    .addComponent(lblHabitacion2)
+                    .addComponent(lblHabitacion3)
+                    .addComponent(lblHabitacion4)
+                    .addComponent(lblHabitacion5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEstado1)
+                    .addComponent(lblEstado2)
+                    .addComponent(lblEstado3)
+                    .addComponent(lblEstado4)
+                    .addComponent(lblEstado5))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPrecio1)
+                    .addComponent(lblPrecio2)
+                    .addComponent(lblPrecio3)
+                    .addComponent(lblPrecio4)
+                    .addComponent(lblPrecio5))
+                .addGap(27, 27, 27)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblHabitacion7)
+                    .addComponent(lblHabitacion6)
+                    .addComponent(lblHabitacion8)
+                    .addComponent(lblHabitacion9)
+                    .addComponent(lblHabitacion10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblEstado7)
+                    .addComponent(lblEstado6)
+                    .addComponent(lblEstado8)
+                    .addComponent(lblEstado9)
+                    .addComponent(lblEstado10))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPrecio7)
+                    .addComponent(lblPrecio6)
+                    .addComponent(lblPrecio8)
+                    .addComponent(lblPrecio9)
+                    .addComponent(lblPrecio10))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblHabitacionSeleccionada)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(spnHabitacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnAceptar)))
+                .addContainerGap(99, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {                                           
+        int numero = (int) spnHabitacion.getValue();
+
+        if (hotel.buscarHabitacionOcupada(numero)) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "La habitación " + numero + " está ocupada.",
+                    "Habitación no disponible",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+
+        } else {
+
+            VentanaIngreso ventanaIngreso =
+                    new VentanaIngreso(hotel, numero);
+
+            ventanaIngreso.setLocationRelativeTo(this);
+            ventanaIngreso.setVisible(true);
+
+            dispose();
+        }
+    }                                          
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new VentanaHabitaciones(new Hotel()).setVisible(true));
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnAceptar;
+    private javax.swing.JLabel lblEstado1;
+    private javax.swing.JLabel lblEstado10;
+    private javax.swing.JLabel lblEstado2;
+    private javax.swing.JLabel lblEstado3;
+    private javax.swing.JLabel lblEstado4;
+    private javax.swing.JLabel lblEstado5;
+    private javax.swing.JLabel lblEstado6;
+    private javax.swing.JLabel lblEstado7;
+    private javax.swing.JLabel lblEstado8;
+    private javax.swing.JLabel lblEstado9;
+    private javax.swing.JLabel lblHabitacion1;
+    private javax.swing.JLabel lblHabitacion10;
+    private javax.swing.JLabel lblHabitacion2;
+    private javax.swing.JLabel lblHabitacion3;
+    private javax.swing.JLabel lblHabitacion4;
+    private javax.swing.JLabel lblHabitacion5;
+    private javax.swing.JLabel lblHabitacion6;
+    private javax.swing.JLabel lblHabitacion7;
+    private javax.swing.JLabel lblHabitacion8;
+    private javax.swing.JLabel lblHabitacion9;
+    private javax.swing.JLabel lblHabitacionSeleccionada;
+    private javax.swing.JLabel lblPrecio1;
+    private javax.swing.JLabel lblPrecio10;
+    private javax.swing.JLabel lblPrecio2;
+    private javax.swing.JLabel lblPrecio3;
+    private javax.swing.JLabel lblPrecio4;
+    private javax.swing.JLabel lblPrecio5;
+    private javax.swing.JLabel lblPrecio6;
+    private javax.swing.JLabel lblPrecio7;
+    private javax.swing.JLabel lblPrecio8;
+    private javax.swing.JLabel lblPrecio9;
+    private javax.swing.JSpinner spnHabitacion;
+    // End of variables declaration                   
+}
+
+//VentanaIngreso.java
+
+package com.mycompany.ejerciciopag546;
+
+public class VentanaIngreso extends javax.swing.JFrame {
+    
+    private Hotel hotel;
+    private int numeroHabitacion;
+
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaIngreso.class.getName());
+
+    /**
+     * Creates new form VentanaIngreso
+     */
+
+public VentanaIngreso(Hotel hotel, int numeroHabitacion) {
+    initComponents();
+
+    this.hotel = hotel;
+    this.numeroHabitacion = numeroHabitacion;
+
+    lblHabitacion.setText(
+            "Habitación seleccionada: " + numeroHabitacion
+    );
+
+    setLocationRelativeTo(null);
+}
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        lblTituloIngreso = new javax.swing.JLabel();
+        lblHabitacion = new javax.swing.JLabel();
+        lblDatosAlojamiento = new javax.swing.JLabel();
+        lblFechaIngreso = new javax.swing.JLabel();
+        txtFechaIngreso = new javax.swing.JTextField();
+        lblDatosHuesped = new javax.swing.JLabel();
+        lblNombres = new javax.swing.JLabel();
+        txtNombres = new javax.swing.JTextField();
+        lblApellidos = new javax.swing.JLabel();
+        txtApellidos = new javax.swing.JTextField();
+        lblDocumento = new javax.swing.JLabel();
+        txtDocumento = new javax.swing.JTextField();
+        btnAceptar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Ejercicio 8.5 Ingreso de huéspedes");
+        setPreferredSize(new java.awt.Dimension(500, 420));
+        setResizable(false);
+
+        lblTituloIngreso.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTituloIngreso.setText("REGISTRO DE INGRESO");
+
+        lblHabitacion.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblHabitacion.setText("Habitación seleccionada:");
+
+        lblDatosAlojamiento.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblDatosAlojamiento.setText("Datos del alojamiento");
+
+        lblFechaIngreso.setText("Fecha de ingreso:");
+
+        txtFechaIngreso.setColumns(12);
+        txtFechaIngreso.setToolTipText("Formato: aaaa-mm-dd");
+
+        lblDatosHuesped.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblDatosHuesped.setText("Datos del huésped");
+
+        lblNombres.setText("Nombres:");
+
+        txtNombres.setColumns(18);
+
+        lblApellidos.setText("Apellidos:");
+
+        txtApellidos.setColumns(18);
+
+        lblDocumento.setText("Documento de indentidad");
+
+        txtDocumento.setColumns(18);
+
+        btnAceptar.setText("Aceptar");
+        btnAceptar.addActionListener(this::btnAceptarActionPerformed);
+
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(btnAceptar)
+                .addGap(18, 18, 18)
+                .addComponent(btnCancelar)
+                .addGap(24, 24, 24))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(56, 56, 56)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblFechaIngreso)
+                    .addComponent(lblNombres)
+                    .addComponent(lblApellidos)
+                    .addComponent(lblDatosAlojamiento)
+                    .addComponent(lblDatosHuesped)
+                    .addComponent(lblDocumento))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtFechaIngreso)
+                    .addComponent(txtNombres)
+                    .addComponent(txtApellidos)
+                    .addComponent(txtDocumento))
+                .addGap(58, 58, 58))
+            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(132, 132, 132)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTituloIngreso)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(lblHabitacion)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(lblTituloIngreso)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblHabitacion)
+                .addGap(12, 12, 12)
+                .addComponent(lblDatosAlojamiento)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFechaIngreso)
+                    .addComponent(txtFechaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(lblDatosHuesped)
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblNombres)
+                    .addComponent(txtNombres, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblApellidos)
+                    .addComponent(txtApellidos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDocumento)
+                    .addComponent(txtDocumento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAceptar)
+                    .addComponent(btnCancelar))
+                .addContainerGap(40, Short.MAX_VALUE))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    dispose();
+    }                                           
+
+    private void btnAceptarActionPerformed(java.awt.event.ActionEvent evt) {                                           
+    String fechaIngreso = txtFechaIngreso.getText().trim();
+    String nombres = txtNombres.getText().trim();
+    String apellidos = txtApellidos.getText().trim();
+    String documento = txtDocumento.getText().trim();
+
+    if (fechaIngreso.isEmpty() || nombres.isEmpty()
+            || apellidos.isEmpty() || documento.isEmpty()) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Todos los campos son obligatorios.",
+                "Error de validación",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+try {
+
+    if (!fechaIngreso.matches("\\d{4}-\\d{2}-\\d{2}")) {
+        throw new java.time.format.DateTimeParseException(
+                "Formato incorrecto", fechaIngreso, 0);
+    }
+
+    java.time.LocalDate fecha =
+            java.time.LocalDate.parse(fechaIngreso);
+
+    if (!nombres.matches("[\\p{L}]+(?:[ ]+[\\p{L}]+)*")) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Los nombres solo deben contener letras y espacios.",
+                "Error de validación",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    if (!apellidos.matches("[\\p{L}]+(?:[ ]+[\\p{L}]+)*")) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Los apellidos solo deben contener letras y espacios.",
+                "Error de validación",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    if (!documento.matches("[0-9]+")) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "El documento de identidad debe contener solo números.",
+                "Error de validación",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    try {
+
+        int numeroDocumento = Integer.parseInt(documento);
+
+        if (numeroDocumento <= 0) {
+            throw new NumberFormatException();
+        }
+
+    } catch (NumberFormatException e) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "El documento debe ser un número positivo "
+                + "dentro del rango permitido.",
+                "Error de validación",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+    
+    int numeroDocumento = Integer.parseInt(documento);
+
+    Habitacion habitacion =
+            hotel.buscarHabitacion(numeroHabitacion);
+
+    if (habitacion == null || !habitacion.getDisponible()) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "La habitación seleccionada no está disponible.",
+                "Error de registro",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    Huesped huesped = new Huesped(
+            nombres,
+            apellidos,
+            numeroDocumento
+    );
+
+    java.util.Date fechaRegistro = java.util.Date.from(
+            fecha.atStartOfDay(
+                    java.time.ZoneId.systemDefault()
+            ).toInstant()
+    );
+
+    huesped.setFechaIngreso(fechaRegistro);
+
+    habitacion.setHuesped(huesped);
+
+    habitacion.setDisponible(false);
+
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "El huésped ha sido registrado correctamente.\n"
+            + "Habitación: " + numeroHabitacion + "\n"
+            + "Huésped: " + nombres + " " + apellidos,
+            "Registro exitoso",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+    );
+
+    dispose();
+
+
+} catch (java.time.format.DateTimeParseException e) {
+
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "La fecha de ingreso no es válida.\n"
+            + "Debe utilizar el formato aaaa-mm-dd.",
+            "Error de fecha",
+            javax.swing.JOptionPane.ERROR_MESSAGE
+    );
+    }
+    }                                          
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */    
+        java.awt.EventQueue.invokeLater(() -> new VentanaIngreso(new Hotel(), 1).setVisible(true));
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnAceptar;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblApellidos;
+    private javax.swing.JLabel lblDatosAlojamiento;
+    private javax.swing.JLabel lblDatosHuesped;
+    private javax.swing.JLabel lblDocumento;
+    private javax.swing.JLabel lblFechaIngreso;
+    private javax.swing.JLabel lblHabitacion;
+    private javax.swing.JLabel lblNombres;
+    private javax.swing.JLabel lblTituloIngreso;
+    private javax.swing.JTextField txtApellidos;
+    private javax.swing.JTextField txtDocumento;
+    private javax.swing.JTextField txtFechaIngreso;
+    private javax.swing.JTextField txtNombres;
+    // End of variables declaration                   
+}
+
+//VentanaPrincipal.java
+
+package com.mycompany.ejerciciopag546;
+
+public class VentanaPrincipal extends javax.swing.JFrame {
+    
+    private Hotel hotel;
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaPrincipal.class.getName());
+
+    /**
+     * Creates new form VentanaPrincipal
+     */
+    public VentanaPrincipal(Hotel hotel) {
+        initComponents();
+        this.hotel = hotel;
+        setLocationRelativeTo(null);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        lblTitulo = new javax.swing.JLabel();
+        lblSubtitulo = new javax.swing.JLabel();
+        lblIndicacion = new javax.swing.JLabel();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        menuOpciones = new javax.swing.JMenu();
+        itemConsultarHabitaciones = new javax.swing.JMenuItem();
+        itemSalidaHuespedes = new javax.swing.JMenuItem();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Ejercicio 8.5 Hotel");
+        setPreferredSize(new java.awt.Dimension(500, 300));
+        setResizable(false);
+
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitulo.setText("SISTEMA DE GESTIÓN HOTELERA");
+
+        lblSubtitulo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblSubtitulo.setText("Administración de habitaciones y huéspedes");
+
+        lblIndicacion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIndicacion.setText("Seleccione una opción del menú para comenzar");
+
+        menuOpciones.setText("Menú");
+        menuOpciones.addActionListener(this::menuOpcionesActionPerformed);
+
+        itemConsultarHabitaciones.setText("Consultar habitaciones");
+        itemConsultarHabitaciones.addActionListener(this::itemConsultarHabitacionesActionPerformed);
+        menuOpciones.add(itemConsultarHabitaciones);
+
+        itemSalidaHuespedes.setText("Salida de huéspedes");
+        itemSalidaHuespedes.addActionListener(this::itemSalidaHuespedesActionPerformed);
+        menuOpciones.add(itemSalidaHuespedes);
+
+        jMenuBar1.add(menuOpciones);
+
+        setJMenuBar(jMenuBar1);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(61, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblTitulo)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(lblSubtitulo))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(lblIndicacion)))
+                .addGap(91, 91, 91))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap(112, Short.MAX_VALUE)
+                .addComponent(lblTitulo)
+                .addGap(18, 18, 18)
+                .addComponent(lblSubtitulo)
+                .addGap(18, 18, 18)
+                .addComponent(lblIndicacion)
+                .addGap(72, 72, 72))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void menuOpcionesActionPerformed(java.awt.event.ActionEvent evt) {                                             
+
+    }                                            
+
+    private void itemSalidaHuespedesActionPerformed(java.awt.event.ActionEvent evt) {                                                    
+    String entrada = javax.swing.JOptionPane.showInputDialog(this, "Ingrese número de habitación:", "Salida de huéspedes",
+            javax.swing.JOptionPane.QUESTION_MESSAGE
+    );
+
+    if (entrada == null) {
+        return;
+    }
+
+    try {
+
+        int numero = Integer.parseInt(entrada.trim());
+
+        if (numero < 1 || numero > 10) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "El número de habitación debe estar entre 1 y 10.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+
+        } else if (!hotel.buscarHabitacionOcupada(numero)) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "La habitación ingresada no está ocupada.",
+                    "Error",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+
+        } else {
+
+            VentanaSalida ventana = new VentanaSalida(hotel, numero);
+
+            ventana.setLocationRelativeTo(this);
+            ventana.setVisible(true);
+        }
+
+    } catch (NumberFormatException e) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Debe ingresar un número de habitación válido.",
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+    }
+    }                                                   
+
+    private void itemConsultarHabitacionesActionPerformed(java.awt.event.ActionEvent evt) {                                                          
+        VentanaHabitaciones ventana = new VentanaHabitaciones(hotel);
+        ventana.setLocationRelativeTo(this);
+        ventana.setVisible(true);
+    }                                                         
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new VentanaPrincipal(new Hotel()).setVisible(true);
+            }
+        });
+}
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JMenuItem itemConsultarHabitaciones;
+    private javax.swing.JMenuItem itemSalidaHuespedes;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JLabel lblIndicacion;
+    private javax.swing.JLabel lblSubtitulo;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JMenu menuOpciones;
+    // End of variables declaration                   
+}
+
+//VentanaSalida.java
+
+package com.mycompany.ejerciciopag546;
+
+public class VentanaSalida extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VentanaSalida.class.getName());
+ 
+    private Hotel hotel;
+    private int numeroHabitacion;
+    private Habitacion habitacionOcupada;
+
+
+    public VentanaSalida(Hotel hotel, int numeroHabitacion) {
+        initComponents();
+
+        this.hotel = hotel;
+        this.numeroHabitacion = numeroHabitacion;
+
+        this.habitacionOcupada =
+                hotel.buscarHabitacion(numeroHabitacion);
+
+        lblHabitacion.setText(
+                "Habitación: " + numeroHabitacion
+        );
+
+        if (habitacionOcupada != null
+                && habitacionOcupada.getHuesped() != null) {
+
+            lblFechaIngreso.setText(
+                    hotel.buscarFechaIngresoHabitacion(numeroHabitacion)
+            );
+        }
+
+        setLocationRelativeTo(null);
+    }
+
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    private void initComponents() {
+
+        lblTituloSalida = new javax.swing.JLabel();
+        lblHabitacion = new javax.swing.JLabel();
+        lblDatosAlojamiento = new javax.swing.JLabel();
+        lblFechaIngresoTitulo = new javax.swing.JLabel();
+        lblFechaIngreso = new javax.swing.JLabel();
+        lblFechaSalida = new javax.swing.JLabel();
+        txtFechaSalida = new javax.swing.JTextField();
+        btnCalcular = new javax.swing.JButton();
+        lblResumen = new javax.swing.JLabel();
+        lblCantidadDiasTitulo = new javax.swing.JLabel();
+        lblCantidadDias = new javax.swing.JLabel();
+        lblTotalTitulo = new javax.swing.JLabel();
+        lblTotalPagar = new javax.swing.JLabel();
+        btnRegistrarSalida = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Ejercicio 8.5 Salida de huéspedes");
+        setPreferredSize(new java.awt.Dimension(700, 400));
+        setResizable(false);
+
+        lblTituloSalida.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTituloSalida.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTituloSalida.setText("REGISTRO DE SALIDA");
+
+        lblHabitacion.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblHabitacion.setText("Habitación:");
+
+        lblDatosAlojamiento.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblDatosAlojamiento.setText("Datos del alojamiento");
+
+        lblFechaIngresoTitulo.setText("Fecha de ingreso:");
+
+        lblFechaIngreso.setText("\t—");
+
+        lblFechaSalida.setText("Fecha de salida:");
+
+        txtFechaSalida.setColumns(12);
+        txtFechaSalida.setToolTipText("Formato: aaaa-mm-dd");
+
+        btnCalcular.setText("Calcular");
+        btnCalcular.addActionListener(this::btnCalcularActionPerformed);
+
+        lblResumen.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        lblResumen.setText("Resumen del alojamiento");
+
+        lblCantidadDiasTitulo.setText("Cantidad de días:");
+
+        lblCantidadDias.setText("\t—");
+
+        lblTotalTitulo.setText("Total a pagar:");
+
+        lblTotalPagar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblTotalPagar.setText("0$");
+
+        btnRegistrarSalida.setText("Registrar salida");
+        btnRegistrarSalida.setEnabled(false);
+        btnRegistrarSalida.addActionListener(this::btnRegistrarSalidaActionPerformed);
+
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(this::btnCancelarActionPerformed);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(101, 101, 101)
+                        .addComponent(lblTituloSalida))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(139, 139, 139)
+                        .addComponent(lblHabitacion))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(35, 35, 35)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblFechaIngresoTitulo)
+                            .addComponent(lblFechaSalida)
+                            .addComponent(lblDatosAlojamiento)
+                            .addComponent(lblResumen)
+                            .addComponent(lblCantidadDiasTitulo)
+                            .addComponent(lblTotalTitulo))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 39, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblFechaIngreso, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblCantidadDias, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                            .addComponent(lblTotalPagar, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+                            .addComponent(txtFechaSalida, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(74, 74, 74))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnCancelar)
+                .addGap(29, 29, 29)
+                .addComponent(btnRegistrarSalida)
+                .addGap(28, 28, 28))
+            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(164, 164, 164)
+                .addComponent(btnCalcular)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(lblTituloSalida)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblHabitacion)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblDatosAlojamiento)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFechaIngresoTitulo)
+                    .addComponent(lblFechaIngreso, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFechaSalida)
+                    .addComponent(txtFechaSalida, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCalcular)
+                .addGap(17, 17, 17)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(3, 3, 3)
+                .addComponent(lblResumen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblCantidadDiasTitulo)
+                    .addComponent(lblCantidadDias, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblTotalTitulo)
+                    .addComponent(lblTotalPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCancelar)
+                    .addComponent(btnRegistrarSalida))
+                .addGap(22, 22, 22))
+        );
+
+        pack();
+    }// </editor-fold>                        
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {                                            
+    dispose();
+    }                                           
+
+    private void btnCalcularActionPerformed(java.awt.event.ActionEvent evt) {                                            
+
+    String textoFechaSalida = txtFechaSalida.getText().trim();
+
+    lblCantidadDias.setText("—");
+    lblTotalPagar.setText("$0");
+    btnRegistrarSalida.setEnabled(false);
+
+    if (textoFechaSalida.isEmpty()) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Debe ingresar la fecha de salida.",
+                "Campo obligatorio",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    try {
+        if (!textoFechaSalida.matches("\\d{4}-\\d{2}-\\d{2}")) {
+
+            throw new java.time.format.DateTimeParseException(
+                    "Formato incorrecto",
+                    textoFechaSalida,
+                    0
+            );
+        }
+        java.time.LocalDate fechaSalida =
+                java.time.LocalDate.parse(textoFechaSalida);
+        java.util.Date fechaIngresoRegistrada =
+                habitacionOcupada.getHuesped().getFechaIngreso();
+        java.time.LocalDate fechaIngreso =
+                fechaIngresoRegistrada.toInstant()
+                        .atZone(java.time.ZoneId.systemDefault())
+                        .toLocalDate();
+        if (!fechaSalida.isAfter(fechaIngreso)) {
+
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "La fecha de salida debe ser posterior "
+                    + "a la fecha de ingreso.\n"
+                    + "Fecha de ingreso: " + fechaIngreso,
+                    "Error de fecha",
+                    javax.swing.JOptionPane.ERROR_MESSAGE
+            );
+
+            return;
+        }
+
+    long dias = java.time.temporal.ChronoUnit.DAYS.between(
+            fechaIngreso,
+            fechaSalida
+    );
+
+    double precioDia = habitacionOcupada.getPrecioDia();
+
+    double totalPagar = dias * precioDia;
+
+    lblCantidadDias.setText(String.valueOf(dias));
+
+    java.text.NumberFormat formatoMoneda =
+            java.text.NumberFormat.getCurrencyInstance(
+                    new java.util.Locale("es", "CO")
+            );
+
+    lblTotalPagar.setText(formatoMoneda.format(totalPagar));
+
+    btnRegistrarSalida.setEnabled(true);
+    txtFechaSalida.setEditable(false);
+
+    } catch (java.time.format.DateTimeParseException e) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "La fecha de salida no es válida.\n"
+                + "Debe utilizar el formato aaaa-mm-dd.",
+                "Error de fecha",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    }                                           
+
+    private void btnRegistrarSalidaActionPerformed(java.awt.event.ActionEvent evt) {                                                   
+    if (!btnRegistrarSalida.isEnabled()) {
+        return;
+    }
+
+    if (habitacionOcupada == null
+            || habitacionOcupada.getDisponible()
+            || habitacionOcupada.getHuesped() == null) {
+
+        javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "La habitación no tiene un huésped registrado.",
+                "Error de salida",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+        );
+
+        return;
+    }
+
+    java.time.LocalDate fechaSalida =
+            java.time.LocalDate.parse(
+                    txtFechaSalida.getText().trim()
+            );
+
+    java.util.Date fechaRegistroSalida =
+            java.util.Date.from(
+                    fechaSalida.atStartOfDay(
+                            java.time.ZoneId.systemDefault()
+                    ).toInstant()
+            );
+
+    habitacionOcupada.getHuesped().setFechaSalida(
+            fechaRegistroSalida
+    );
+
+    habitacionOcupada.setHuesped(null);
+    habitacionOcupada.setDisponible(true);
+
+    javax.swing.JOptionPane.showMessageDialog(
+            this,
+            "La salida del huésped se ha registrado correctamente.\n"
+            + "Habitación: " + numeroHabitacion + "\n"
+            + "Días de alojamiento: " + lblCantidadDias.getText() + "\n"
+            + "Total a pagar: " + lblTotalPagar.getText() + "\n"
+            + "La habitación ahora está disponible.",
+            "Salida registrada",
+            javax.swing.JOptionPane.INFORMATION_MESSAGE
+    );
+
+    dispose();
+    }                                                  
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new VentanaSalida(new Hotel(), 1).setVisible(true));
+    }
+
+    // Variables declaration - do not modify                     
+    private javax.swing.JButton btnCalcular;
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnRegistrarSalida;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lblCantidadDias;
+    private javax.swing.JLabel lblCantidadDiasTitulo;
+    private javax.swing.JLabel lblDatosAlojamiento;
+    private javax.swing.JLabel lblFechaIngreso;
+    private javax.swing.JLabel lblFechaIngresoTitulo;
+    private javax.swing.JLabel lblFechaSalida;
+    private javax.swing.JLabel lblHabitacion;
+    private javax.swing.JLabel lblResumen;
+    private javax.swing.JLabel lblTituloSalida;
+    private javax.swing.JLabel lblTotalPagar;
+    private javax.swing.JLabel lblTotalTitulo;
+    private javax.swing.JTextField txtFechaSalida;
+    // End of variables declaration                   
+}
